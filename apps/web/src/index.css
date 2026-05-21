@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #aa3bff;
+  --color-brand-muted: rgba(170, 59, 255, 0.1);
+  --color-border-subtle: #e5e4e7;
+  --color-app: #fff;
+  --color-text-main: #6b6375;
+  --color-text-heading: #08060d;
+
+  --font-sans: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-app text-text-main font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text-heading font-medium tracking-tight;
+  }
+}

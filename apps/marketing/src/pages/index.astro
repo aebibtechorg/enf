@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Counter from '../components/Counter';
+---
+
+<Layout title="Example App | The AI-Native Blueprint">
+	<main class="max-w-4xl mx-auto px-6 py-24 flex flex-col items-center text-center gap-12">
+		<header class="flex flex-col gap-4">
+			<h1 class="text-6xl font-black tracking-tight text-zinc-950">
+				Build faster with <span class="text-primary">Example App</span>
+			</h1>
+			<p class="text-xl text-zinc-600 max-w-2xl mx-auto">
+				The high-performance, AI-native platform blueprint for modern engineering teams.
+				Built with .NET 10, React, Astro, and Flutter.
+			</p>
+		</header>
+
+		<div class="flex gap-4">
+			<a href="https://github.com/paul/Example App" class="px-8 py-3 bg-zinc-900 text-white rounded-full font-bold hover:bg-zinc-800 transition-colors">
+				Get Started
+			</a>
+			<a href="#" class="px-8 py-3 border border-zinc-200 rounded-full font-bold hover:bg-zinc-50 transition-colors">
+				Documentation
+			</a>
+		</div>
+
+		<section class="w-full mt-12 py-12 border-y border-zinc-100">
+			<h2 class="text-2xl font-bold mb-8">Try an interactive component</h2>
+			<Counter client:load />
+		</section>
+
+		<footer class="text-zinc-400 text-sm">
+			&copy; 2026 Example App. All rights reserved.
+		</footer>
+	</main>
+</Layout>

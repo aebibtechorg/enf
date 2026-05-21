@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_vercel_api_token: ${{ secrets.VERCEL_API_TOKEN }}
+      TF_VAR_vercel_team_id: ${{ secrets.VERCEL_TEAM_ID }}
+      TF_VAR_neon_api_key: ${{ secrets.NEON_API_KEY }}
+      TF_VAR_upstash_email: ${{ secrets.UPSTASH_EMAIL }}
+      TF_VAR_upstash_api_key: ${{ secrets.UPSTASH_API_KEY }}
+      TF_VAR_better_auth_secret: ${{ secrets.BETTER_AUTH_SECRET }}
+      TF_VAR_better_auth_admin_emails: ${{ secrets.BETTER_AUTH_ADMIN_EMAILS }}
+      TF_VAR_better_auth_admin_password: ${{ secrets.BETTER_AUTH_ADMIN_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Configure Docker for GCP
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push API
+        run: |
+          docker build -t gcr.io/$GCP_PROJECT_ID/example-app-api:latest -f apps/api/Dockerfile .
+          docker push gcr.io/$GCP_PROJECT_ID/example-app-api:latest
+
+      - name: Build and Push Auth Server
+        run: |
+          docker build -t gcr.io/$GCP_PROJECT_ID/example-app-auth:latest -f apps/web/server.Dockerfile .
+          docker push gcr.io/$GCP_PROJECT_ID/example-app-auth:latest
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infrastructure
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: infrastructure

@@ -1,0 +1,13 @@
+.git
+node_modules
+bin
+obj
+dist
+.astro
+.next
+out
+*.log
+.pnpm-store
+.vscode
+infrastructure
+.github

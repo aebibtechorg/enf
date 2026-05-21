@@ -1,0 +1,7 @@
+{
+  "appName": "Example App",
+  "displayName": "Example App",
+  "npmScope": "example-app",
+  "androidPackageRoot": "exampleapp",
+  "androidUrlScheme": "exampleapp"
+}

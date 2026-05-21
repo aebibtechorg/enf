@@ -1,0 +1,32 @@
+{
+  "name": "Example App",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migration:create": "dotnet tool restore && node ./tools/create-ef-migration.mjs",
+    "set-example-app": "node ./scripts/set-example-app.mjs",
+    "set-example-app:apply": "node ./scripts/set-example-app.mjs --apply"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.1.2",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
