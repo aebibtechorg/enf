@@ -14,6 +14,7 @@
   "dependencies": {
     "@Example App/ui": "workspace:*",
     "@better-auth/infra": "^0.2.8",
+    "@microsoft/signalr": "^10.0.0",
     "@tanstack/react-query": "^5.100.10",
     "@tanstack/react-router": "^1.170.2",
     "@tanstack/react-start": "^1.168.3",
@@ -25,6 +26,8 @@
     "pg": "^8.20.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "simple-peer": "^9.11.1",
+    "vite-plugin-node-polyfills": "^0.28.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -35,6 +38,7 @@
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/simple-peer": "^9.11.9",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

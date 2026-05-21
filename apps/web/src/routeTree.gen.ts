@@ -9,12 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NotarizationBookRouteImport } from './routes/notarization/book'
+import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
+import { Route as NotarizationSessionIdRouteImport } from './routes/notarization/session.$id'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -23,6 +33,11 @@ const UsersRoute = UsersRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -40,47 +55,120 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotarizationBookRoute = NotarizationBookRouteImport.update({
+  id: '/notarization/book',
+  path: '/notarization/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
+  id: '/auth/two-factor',
+  path: '/auth/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotarizationSessionIdRoute = NotarizationSessionIdRouteImport.update({
+  id: '/notarization/session/$id',
+  path: '/notarization/session/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/users': typeof UsersRoute
+  '/verify': typeof VerifyRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/notarization/book': typeof NotarizationBookRoute
+  '/notarization/session/$id': typeof NotarizationSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/users': typeof UsersRoute
+  '/verify': typeof VerifyRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/notarization/book': typeof NotarizationBookRoute
+  '/notarization/session/$id': typeof NotarizationSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/users': typeof UsersRoute
+  '/verify': typeof VerifyRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
+  '/notarization/book': typeof NotarizationBookRoute
+  '/notarization/session/$id': typeof NotarizationSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/reset-password' | '/users'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/reset-password'
+    | '/users'
+    | '/verify'
+    | '/auth/two-factor'
+    | '/notarization/book'
+    | '/notarization/session/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/reset-password' | '/users'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/reset-password' | '/users'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/reset-password'
+    | '/users'
+    | '/verify'
+    | '/auth/two-factor'
+    | '/notarization/book'
+    | '/notarization/session/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/onboarding'
+    | '/reset-password'
+    | '/users'
+    | '/verify'
+    | '/auth/two-factor'
+    | '/notarization/book'
+    | '/notarization/session/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   UsersRoute: typeof UsersRoute
+  VerifyRoute: typeof VerifyRoute
+  AuthTwoFactorRoute: typeof AuthTwoFactorRoute
+  NotarizationBookRoute: typeof NotarizationBookRoute
+  NotarizationSessionIdRoute: typeof NotarizationSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users': {
       id: '/users'
       path: '/users'
@@ -93,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -116,6 +211,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notarization/book': {
+      id: '/notarization/book'
+      path: '/notarization/book'
+      fullPath: '/notarization/book'
+      preLoaderRoute: typeof NotarizationBookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/two-factor': {
+      id: '/auth/two-factor'
+      path: '/auth/two-factor'
+      fullPath: '/auth/two-factor'
+      preLoaderRoute: typeof AuthTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notarization/session/$id': {
+      id: '/notarization/session/$id'
+      path: '/notarization/session/$id'
+      fullPath: '/notarization/session/$id'
+      preLoaderRoute: typeof NotarizationSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -123,8 +239,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   UsersRoute: UsersRoute,
+  VerifyRoute: VerifyRoute,
+  AuthTwoFactorRoute: AuthTwoFactorRoute,
+  NotarizationBookRoute: NotarizationBookRoute,
+  NotarizationSessionIdRoute: NotarizationSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

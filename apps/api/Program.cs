@@ -1,5 +1,7 @@
 using Api.Infrastructure.Database;
 using Api.Features;
+using Api.Features.Notarization;
+using Api.Infrastructure.Cryptography;
 using Api.Infrastructure.Storage;
 using Api.Infrastructure.Auth;
 using Api.Shared.Middleware;
@@ -56,6 +58,9 @@ else
     builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
 }
 
+builder.Services.AddScoped<INotarizationService, NotarizationService>();
+builder.Services.AddScoped<ICryptographyService, CryptographyService>();
+builder.Services.AddSignalR();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddHttpClient<BetterAuthJwksProvider>();

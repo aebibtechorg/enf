@@ -22,7 +22,7 @@ export function Sidebar() {
         </div>
         
         <nav className="space-y-1">
-          {navItems.map((item) => (
+          {navItems.filter(item => !('enpOnly' in item) || (item.enpOnly && user?.isEnp)).map((item) => (
             <Link
               key={item.to}
               to={item.to}

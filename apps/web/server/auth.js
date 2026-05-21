@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { jwt } from 'better-auth/plugins/jwt'
-import { admin } from 'better-auth/plugins'
+import { admin, twoFactor } from 'better-auth/plugins'
 import { Pool } from 'pg'
 import { dash } from '@better-auth/infra'
 
@@ -56,11 +56,43 @@ function parseConnectionString(value) {
 export const database = new Pool(parseConnectionString(connectionString))
 
 export const auth = betterAuth({
-  appName: 'Example App',
+  appName: 'Republic of the Philippines ENF',
   baseURL,
   trustedOrigins,
   secret,
   database,
+  user: {
+    additionalFields: {
+      isEnp: {
+        type: 'boolean',
+        defaultValue: false,
+      },
+      commissionNumber: {
+        type: 'string',
+        required: false,
+      },
+      commissionExpiry: {
+        type: 'string',
+        required: false,
+      },
+      rollNumber: {
+        type: 'string',
+        required: false,
+      },
+      ibpNumber: {
+        type: 'string',
+        required: false,
+      },
+      regularPlaceOfBusiness: {
+        type: 'string',
+        required: false,
+      },
+      ekycStatus: {
+        type: 'string',
+        defaultValue: 'none',
+      },
+    },
+  },
   plugins: [
     jwt({
       jwks: {
@@ -72,6 +104,9 @@ export const auth = betterAuth({
     }),
     admin(),
     dash(),
+    twoFactor({
+      issuer: 'Republic of the Philippines ENF',
+    }),
   ],
   emailAndPassword: {
     enabled: true,

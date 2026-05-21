@@ -13,6 +13,14 @@ export async function requireAuth(redirectTarget: string) {
     })
   }
 
+  // Check for onboarding status
+  const ekycStatus = (data.user as any).ekycStatus
+  if (ekycStatus === 'none' && !redirectTarget.includes('/onboarding')) {
+    throw redirect({
+      to: '/onboarding',
+    })
+  }
+
   return data
 }
 

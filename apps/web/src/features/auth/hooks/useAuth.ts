@@ -1,8 +1,12 @@
 import { createContext, useContext } from 'react'
+import type { authClient } from '../../../lib/auth-client'
+
+export type User = typeof authClient.$Infer.Session.user
+export type Session = typeof authClient.$Infer.Session.session
 
 export interface AuthContextType {
-  user: { email: string; name?: string | null } | null
-  token: string | null
+  user: User | null
+  session: Session | null
   login: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, name?: string) => Promise<void>
   forgetPassword: (email: string) => Promise<void>

@@ -4,7 +4,7 @@ import { navItems } from '../../config/navigation'
 import { useAuth } from '../../features/auth/hooks/useAuth'
 
 export function MobileNav() {
-  const { isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -14,7 +14,7 @@ export function MobileNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-border-subtle flex items-center justify-around px-2 z-50">
-      {navItems.map((item) => (
+      {navItems.filter(item => !('enpOnly' in item) || (item.enpOnly && user?.isEnp)).map((item) => (
         <Link
           key={item.to}
           to={item.to}

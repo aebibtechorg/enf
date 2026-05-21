@@ -1,4 +1,4 @@
-import { Home, Users, LayoutDashboard } from 'lucide-react'
+import { Home, Users, LayoutDashboard, Book, ShieldCheck } from 'lucide-react'
 
 export const navItems = [
   {
@@ -10,6 +10,17 @@ export const navItems = [
     label: 'Dashboard',
     to: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    label: 'Notarial Book',
+    to: '/notarization/book',
+    icon: Book,
+    enpOnly: true,
+  },
+  {
+    label: 'Verify Document',
+    to: '/verify',
+    icon: ShieldCheck,
   },
   {
     label: 'Users',
