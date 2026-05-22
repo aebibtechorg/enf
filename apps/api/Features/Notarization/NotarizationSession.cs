@@ -4,8 +4,15 @@ namespace Api.Features.Notarization;
 
 public enum SessionType
 {
-    Ien, // In-person
-    Ren  // Remote
+    Ien, // In-person Electronic Notarization
+    Ren  // Remote Electronic Notarization
+}
+
+public enum LocationType
+{
+    Philippines,
+    EmbassyConsulate, // Limited extraterritorial case
+    Other // Generally prohibited for REN
 }
 
 public class NotarizationSession
@@ -28,8 +35,15 @@ public class NotarizationSession
     
     // Geolocation verification
     public string? PrincipalLocation { get; set; }
+    public LocationType PrincipalLocationType { get; set; } = LocationType.Philippines;
+    
     public string? EnpLocation { get; set; }
+    public LocationType EnpLocationType { get; set; } = LocationType.Philippines;
+    
     public bool GeolocationVerified { get; set; }
     
+    public string? SumsubInspectionId { get; set; }
+    
     public List<NotarizationDocument> Documents { get; set; } = [];
+    public List<NotarizationWitness> Witnesses { get; set; } = [];
 }

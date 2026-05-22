@@ -13,13 +13,26 @@ export async function requireAuth(redirectTarget: string) {
     })
   }
 
-  // Check for onboarding status
-  const ekycStatus = (data.user as any).ekycStatus
-  if (ekycStatus === 'none' && !redirectTarget.includes('/onboarding')) {
+  const user = data.user as any
+  const role = user.role
+  const isOnboarded = user.isOnboarded
+
+  // ENA (Admin) bypasses onboarding and has full access
+  if (role === 'admin' || role === 'ena') {
+    return data
+  }
+
+  // Force onboarding for users who haven't completed it
+  if (!isOnboarded && !redirectTarget.includes('/onboarding')) {
     throw redirect({
       to: '/onboarding',
     })
   }
+
+  // If onboarded but not yet an ENP, they might be pending
+  // We can add a "Pending" screen or just let them see a limited dashboard
+  // For now, let's assume if they are onboarded they can see the dashboard
+  // but specific actions (like signing) will check for the 'enp' role on the server.
 
   return data
 }

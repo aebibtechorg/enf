@@ -8,7 +8,7 @@ namespace Api.Features.Notarization;
 
 public interface INotarizationService
 {
-    Task<string> GenerateCertificateAsync(NotarizationDocument document, User enp, CancellationToken ct = default);
+    Task<string> GenerateCertificateAsync(NotarizationDocument document, User enp, NotarizationSession session, CancellationToken ct = default);
 }
 
 public class NotarizationService : INotarizationService
@@ -21,7 +21,7 @@ public class NotarizationService : INotarizationService
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
-    public async Task<string> GenerateCertificateAsync(NotarizationDocument document, User enp, CancellationToken ct = default)
+    public async Task<string> GenerateCertificateAsync(NotarizationDocument document, User enp, NotarizationSession session, CancellationToken ct = default)
     {
         var documentTitle = document.FileName;
         var enpName = enp.FullName;
@@ -30,6 +30,11 @@ public class NotarizationService : INotarizationService
         var commissionExpiry = enp.CommissionExpiry?.ToString("MMMM dd, row") ?? "N/A";
         var ibpNumber = enp.IbpNumber;
         var businessAddress = enp.RegularPlaceOfBusiness;
+
+        var modeDescription = session.Type == SessionType.Ren ? "Remote Electronic Notarization (REN)" : "In-Person Electronic Notarization (IEN)";
+        var locationDescription = session.PrincipalLocationType == LocationType.EmbassyConsulate 
+            ? $"Philippine Embassy/Consular Office at {session.PrincipalLocation}" 
+            : $"Physical Presence in the Philippines ({session.PrincipalLocation})";
 
         var pdfData = Document.Create(container =>
         {
@@ -45,8 +50,30 @@ public class NotarizationService : INotarizationService
                 page.Content().PaddingVertical(20).Column(col =>
                 {
                     col.Spacing(10);
-                    col.Item().Text($"This is to certify that the electronic document titled \"{documentTitle}\" was notarized electronically on {DateTime.UtcNow:MMMM dd, yyyy}.");
+                    col.Item().Text($"This is to certify that the electronic document titled \"{documentTitle}\" was notarized electronically on {DateTime.UtcNow:MMMM dd, yyyy} via {modeDescription}.");
                     
+                    col.Item().PaddingTop(5).Text(text => {
+                        text.Span("Location Verification: ").SemiBold();
+                        text.Span(locationDescription);
+                    });
+
+                    if (!string.IsNullOrEmpty(session.SumsubInspectionId))
+                    {
+                        col.Item().PaddingTop(5).Text(text => {
+                            text.Span("Identity Verification (eKYC): ").SemiBold();
+                            text.Span($"Sumsub Inspection ID: {session.SumsubInspectionId}");
+                        });
+                    }
+
+                    if (session.Witnesses.Any())
+                    {
+                        col.Item().PaddingTop(10).Text("WITNESSES").SemiBold();
+                        foreach (var witness in session.Witnesses)
+                        {
+                            col.Item().Text($"- {witness.FullName} (ID: {witness.IdentityEvidence})");
+                        }
+                    }
+
                     col.Item().PaddingTop(10).Text("ELECTRONIC NOTARY PUBLIC DETAILS").SemiBold();
                     col.Item().Text($"Name: {enpName}");
                     col.Item().Text($"Roll of Attorneys No.: {rollNumber}");
@@ -69,6 +96,8 @@ public class NotarizationService : INotarizationService
                         // Placeholder for QR Code
                         row.ConstantItem(60).Height(60).Background(Colors.Grey.Lighten3).AlignCenter().AlignMiddle().Text("QR CODE");
                     });
+
+                    col.Item().PaddingTop(20).Text("This document was notarized using an accredited Electronic Notarization Facility (ENF) in compliance with A.M. No. 24-10-14-SC.").Italic().FontSize(10);
                 });
 
                 page.Footer().AlignCenter().Text(x =>

@@ -1,8 +1,8 @@
 #:package CommunityToolkit.Aspire.Hosting.Ngrok@13.3.0
-#:package Aspire.Hosting.JavaScript@13.3.3
-#:package Aspire.Hosting.PostgreSQL@13.3.3
-#:package Aspire.Hosting.Redis@13.3.3
-#:sdk Aspire.AppHost.Sdk@13.3.3
+#:package Aspire.Hosting.JavaScript@13.3.5
+#:package Aspire.Hosting.PostgreSQL@13.3.5
+#:package Aspire.Hosting.Redis@13.3.5
+#:sdk Aspire.AppHost.Sdk@13.3.5
 
 using System.IO;
 using System.Text.Json;
@@ -51,7 +51,7 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume()
     .WithPgAdmin();
 
-var database = postgres.AddDatabase("appdb");
+var database = postgres.AddDatabase("enfdb");
 
 var redis = builder.AddRedis("redis");
 
@@ -77,6 +77,9 @@ var api = builder.AddProject("api", "../api/Api.csproj")
     .WithEnvironment(e =>
     {
         e.EnvironmentVariables.Add("Auth__Authority", auth.GetEndpoint("http").Url);
+        e.EnvironmentVariables.Add("Sumsub__AppToken", builder.Configuration["Sumsub:AppToken"] ?? "");
+        e.EnvironmentVariables.Add("Sumsub__SecretKey", builder.Configuration["Sumsub:SecretKey"] ?? "");
+        e.EnvironmentVariables.Add("Sumsub__WebhookSecret", builder.Configuration["Sumsub:WebhookSecret"] ?? "");
     })
     .WaitFor(auth);
 

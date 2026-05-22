@@ -3,6 +3,7 @@ using System;
 using Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522054038_Adjustments")]
+    partial class Adjustments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,10 +207,6 @@ namespace Api.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("SumsubInspectionId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
@@ -301,9 +300,6 @@ namespace Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsEnp")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsOnboarded")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("RegularPlaceOfBusiness")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -311,17 +307,6 @@ namespace Api.Infrastructure.Database.Migrations
                     b.Property<string>("RollNumber")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<string>("SumsubApplicantId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("SumsubInspectionId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("WatchedInstructionalVideo")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

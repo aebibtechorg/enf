@@ -28,4 +28,9 @@ public class NotarizationHub : Hub
     {
         await Clients.Group(sessionId).SendAsync("DocumentStatusUpdated", documentId, status);
     }
+
+    public async Task WitnessAdded(string sessionId, object witness)
+    {
+        await Clients.Group(sessionId).SendAsync("WitnessAdded", witness);
+    }
 }

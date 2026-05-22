@@ -14,10 +14,18 @@ export function MobileNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-t border-border-subtle flex items-center justify-around px-2 z-50">
-      {navItems.filter(item => !('enpOnly' in item) || (item.enpOnly && user?.isEnp)).map((item) => (
+      {navItems.filter(item => {
+        const isEnp = user?.role === 'enp' || (user as any)?.isEnp;
+        const isEna = user?.role === 'ena' || user?.role === 'admin';
+        
+        if ('enpOnly' in item && item.enpOnly && !isEnp) return false;
+        if ('enaOnly' in item && item.enaOnly && !isEna) return false;
+        
+        return true;
+      }).map((item) => (
         <Link
           key={item.to}
-          to={item.to}
+          to={item.to as any}
           activeProps={{ className: 'text-brand' }}
           className="flex flex-col items-center justify-center gap-1 flex-1 py-1 text-text-main transition-colors"
         >

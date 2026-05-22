@@ -24,6 +24,8 @@ public static class NotarizationEndpoints
         group.MapPost("/sessions", CreateSessionAsync);
         group.MapGet("/sessions/{id}", GetSessionAsync);
         group.MapPost("/sessions/{id}/join", JoinSessionAsync);
+        group.MapPost("/sessions/{id}/recording", UploadRecordingAsync);
+        group.MapPost("/sessions/{id}/witnesses", AddWitnessAsync);
 
         // Notarial Book
         group.MapGet("/notarial-book", GetMyNotarialBookAsync);
@@ -99,6 +101,7 @@ public static class NotarizationEndpoints
     private static async Task<IResult> JoinSessionAsync(
         Guid id,
         string location,
+        LocationType locationType,
         ClaimsPrincipal principal,
         AppDbContext db,
         HttpContext httpContext)
@@ -113,15 +116,30 @@ public static class NotarizationEndpoints
         if (session.PrincipalId != user.Id && session.EnpId != user.Id)
             return Results.Forbid();
 
-        var ip = httpContext.Connection.RemoteIpAddress?.ToString();
-        
+        if (session.PrincipalId == user.Id && locationType == LocationType.Other)
+        {
+            return Results.BadRequest("Notarization requires the principal to be physically located in the Philippines or a Philippine Embassy/Consular office (Rule IV, Sec 5).");
+        }
+
+        if (session.EnpId == user.Id && locationType == LocationType.Other)
+        {
+            return Results.BadRequest("The Electronic Notary Public must be situated within the Philippines or a Philippine Embassy/Consular office (Rule XI, Sec 3).");
+        }
+
         if (session.PrincipalId == user.Id)
         {
+            if (user.EkycStatus != "verified")
+            {
+                return Results.BadRequest("Principal must complete eKYC before joining the session.");
+            }
             session.PrincipalLocation = location;
+            session.PrincipalLocationType = locationType;
+            session.SumsubInspectionId = user.SumsubInspectionId; // Bind identity verification to session
         }
         else
         {
             session.EnpLocation = location;
+            session.EnpLocationType = locationType;
         }
 
         if (!session.StartedAt.HasValue) session.StartedAt = DateTime.UtcNow;
@@ -130,6 +148,47 @@ public static class NotarizationEndpoints
         await db.SaveChangesAsync();
 
         return Results.Ok(session);
+    }
+
+    private static async Task<IResult> AddWitnessAsync(
+        Guid id,
+        string fullName,
+        string address,
+        string identityEvidence,
+        ClaimsPrincipal principal,
+        AppDbContext db)
+    {
+        var session = await db.NotarizationSessions.FindAsync(id);
+        if (session == null) return Results.NotFound();
+
+        var witness = new NotarizationWitness
+        {
+            Id = Guid.NewGuid(),
+            FullName = fullName,
+            Address = address,
+            IdentityEvidence = identityEvidence,
+            SessionId = id
+        };
+
+        db.NotarizationWitnesses.Add(witness);
+        await db.SaveChangesAsync();
+
+        return Results.Ok(witness);
+    }
+
+    private static async Task<IResult> UploadRecordingAsync(
+        Guid id,
+        string fileId,
+        ClaimsPrincipal principal,
+        AppDbContext db)
+    {
+        var session = await db.NotarizationSessions.FindAsync(id);
+        if (session == null) return Results.NotFound();
+
+        session.RecordingFileId = fileId;
+        await db.SaveChangesAsync();
+
+        return Results.Ok();
     }
 
     private static async Task<IResult> CompleteNotarizationAsync(
@@ -143,11 +202,32 @@ public static class NotarizationEndpoints
         var enp = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (enp == null || !enp.IsEnp) return Results.Forbid();
 
+        // Rule VII, Sec 2, x: Certify that the ENP has studied instructional materials
+        if (!enp.WatchedInstructionalVideo) 
+        {
+            return Results.BadRequest("The Electronic Notary Public must complete the on-demand instructional video before performing notarial acts.");
+        }
+
         var doc = await db.NotarizationDocuments
             .Include(d => d.Principal)
             .FirstOrDefaultAsync(d => d.Id == id);
 
         if (doc == null) return Results.NotFound();
+        
+        // Find active session for this document/principal
+        var session = await db.NotarizationSessions
+            .Include(s => s.Witnesses)
+            .FirstOrDefaultAsync(s => s.EnpId == enp.Id && s.PrincipalId == doc.PrincipalId && s.StartedAt.HasValue && !s.EndedAt.HasValue);
+
+        if (session == null) return Results.BadRequest("No active notarization session found.");
+        if (!session.GeolocationVerified) return Results.BadRequest("Location has not been verified for this session.");
+
+        // Rule IV, Sec 8: Recording requirement for REN
+        if (session.Type == SessionType.Ren && string.IsNullOrEmpty(session.RecordingFileId))
+        {
+            return Results.BadRequest("Session recording must be uploaded before completing Remote Electronic Notarization (REN).");
+        }
+
         if (string.IsNullOrEmpty(enp.DigitalCertificate)) return Results.BadRequest("ENP does not have a digital certificate issued.");
 
         doc.EnpId = enp.Id;
@@ -162,7 +242,7 @@ public static class NotarizationEndpoints
         Console.WriteLine($"[PKI] Document {doc.Id} sealed by ENP {enp.FullName}. Signature: {Convert.ToBase64String(signature)}");
 
         // Generate Certificate
-        var certificateFileId = await notarizationService.GenerateCertificateAsync(doc, enp);
+        var certificateFileId = await notarizationService.GenerateCertificateAsync(doc, enp, session);
         doc.PdfAFileId = certificateFileId;
 
         // Create Notarial Book Entry
@@ -175,12 +255,21 @@ public static class NotarizationEndpoints
             DocumentTitle = doc.FileName,
             PerformedAt = DateTime.UtcNow,
             NotarialAct = "Electronic Notarization", 
-            InPhilippines = true,
-            Mode = SessionType.Ren, 
+            Mode = session.Type, 
+            PrincipalLocationType = session.PrincipalLocationType,
+            PrincipalActualLocation = session.PrincipalLocation ?? "Unknown",
             NotarizedFileId = certificateFileId,
             EntryNumber = entryCount + 1,
             PrincipalAddress = "Verified Address",
-            PrincipalIdentityEvidence = "Government ID"
+            PrincipalIdentityEvidence = "Government ID",
+            Witnesses = session.Witnesses.Select(w => new NotarizationWitness
+            {
+                Id = Guid.NewGuid(),
+                FullName = w.FullName,
+                Address = w.Address,
+                IdentityEvidence = w.IdentityEvidence,
+                Signature = w.Signature
+            }).ToList()
         };
         db.NotarialBookEntries.Add(entry);
 

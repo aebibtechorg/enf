@@ -4,6 +4,7 @@ using Api.Features.Notarization;
 using Api.Infrastructure.Cryptography;
 using Api.Infrastructure.Storage;
 using Api.Infrastructure.Auth;
+using Api.Infrastructure.Sumsub;
 using Api.Shared.Middleware;
 using Api.Shared.Security;
 using FluentValidation;
@@ -20,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
-builder.AddNpgsqlDbContext<AppDbContext>("appdb", configureDbContextOptions: options =>
+builder.AddNpgsqlDbContext<AppDbContext>("enfdb", configureDbContextOptions: options =>
 {
     options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
 });
@@ -63,6 +64,7 @@ else
 
 builder.Services.AddScoped<INotarizationService, NotarizationService>();
 builder.Services.AddScoped<ICryptographyService, CryptographyService>();
+builder.Services.AddScoped<ISumsubService, SumsubService>();
 builder.Services.AddSignalR();
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

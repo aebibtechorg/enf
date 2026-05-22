@@ -19,8 +19,9 @@ public class ElectronicNotarialBookEntry
     
     public decimal FeeCharged { get; set; }
     
-    public bool InPhilippines { get; set; } // Statement that act was in PH or Embassy
     public SessionType Mode { get; set; } // IEN or REN
+    public LocationType PrincipalLocationType { get; set; }
+    public string PrincipalActualLocation { get; set; } = string.Empty; // Verified physical location
     
     public string? Remarks { get; set; }
     
@@ -32,4 +33,6 @@ public class ElectronicNotarialBookEntry
     
     // Chronological indexing
     public int EntryNumber { get; set; }
+
+    public List<NotarizationWitness> Witnesses { get; set; } = [];
 }

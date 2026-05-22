@@ -13,6 +13,14 @@ export interface NotarizationDocument {
   pdfAFileId?: string
 }
 
+export interface NotarizationWitness {
+  id: string
+  fullName: string
+  address: string
+  identityEvidence: string
+  signature?: string
+}
+
 export interface NotarizationSession {
   id: string
   type: 0 | 1 // Ien, Ren
@@ -23,8 +31,13 @@ export interface NotarizationSession {
   enpId: string
   meetingUrl?: string
   recordingFileId?: string
+  principalLocation?: string
+  principalLocationType: 0 | 1 | 2 // Philippines, EmbassyConsulate, Other
+  enpLocation?: string
+  enpLocationType: 0 | 1 | 2
   geolocationVerified: boolean
   documents: NotarizationDocument[]
+  witnesses: NotarizationWitness[]
 }
 
 export interface ElectronicNotarialBookEntry {
@@ -36,12 +49,14 @@ export interface ElectronicNotarialBookEntry {
   principalAddress: string
   principalIdentityEvidence: string
   feeCharged: number
-  inPhilippines: boolean
   mode: 0 | 1
+  principalLocationType: 0 | 1 | 2
+  principalActualLocation: string
   remarks?: string
   enpId: string
   notarizedFileId: string
   entryNumber: number
+  witnesses: NotarizationWitness[]
 }
 
 export function useMyDocuments() {
@@ -108,14 +123,25 @@ export function useCreateSession() {
 export function useJoinSession() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, location }: { id: string; location: string }) => {
+    mutationFn: async ({ id, location, locationType }: { id: string; location: string; locationType: 0 | 1 | 2 }) => {
       return fetchApi<NotarizationSession>(`/api/notarization/sessions/${id}/join`, {
         method: 'POST',
-        body: JSON.stringify({ location }),
+        body: JSON.stringify({ location, locationType }),
       })
     },
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['notarization', 'sessions', variables.id] })
+    },
+  })
+}
+
+export function useUploadRecording() {
+  return useMutation({
+    mutationFn: async ({ id, fileId }: { id: string; fileId: string }) => {
+      return fetchApi(`/api/notarization/sessions/${id}/recording`, {
+        method: 'POST',
+        body: JSON.stringify({ fileId }),
+      })
     },
   })
 }

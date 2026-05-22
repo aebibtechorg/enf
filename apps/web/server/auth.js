@@ -64,9 +64,9 @@ export const auth = betterAuth({
   database,
   user: {
     additionalFields: {
-      isEnp: {
-        type: 'boolean',
-        defaultValue: false,
+      role: {
+        type: 'string',
+        defaultValue: 'user', // Default to 'user', which will be changed to 'enp' or 'ena'
       },
       commissionNumber: {
         type: 'string',
@@ -91,6 +91,16 @@ export const auth = betterAuth({
       ekycStatus: {
         type: 'string',
         defaultValue: 'none',
+      },
+      isOnboarded: {
+        type: 'boolean',
+        defaultValue: false,
+        required: false,
+      },
+      watchedInstructionalVideo: {
+        type: 'boolean',
+        defaultValue: false,
+        required: false,
       },
     },
   },

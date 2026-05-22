@@ -21,10 +21,10 @@ function Dashboard() {
           <p className="mt-1 text-stone-500">Welcome back, {user?.name || user?.email}.</p>
         </div>
         <Link 
-          to="/onboarding" 
+          to="/notarization/session/new" 
           className="rounded-2xl bg-stone-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
         >
-          New Notarization
+          New Notarization Session
         </Link>
       </div>
 

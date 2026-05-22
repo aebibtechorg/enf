@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<NotarizationDocument> NotarizationDocuments => Set<NotarizationDocument>();
     public DbSet<NotarizationSession> NotarizationSessions => Set<NotarizationSession>();
     public DbSet<ElectronicNotarialBookEntry> NotarialBookEntries => Set<ElectronicNotarialBookEntry>();
+    public DbSet<NotarizationWitness> NotarizationWitnesses => Set<NotarizationWitness>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,6 +33,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.IbpNumber).HasMaxLength(100);
             entity.Property(e => e.RegularPlaceOfBusiness).HasMaxLength(500);
             entity.Property(e => e.EkycStatus).HasMaxLength(50).HasDefaultValue("none");
+            entity.Property(e => e.SumsubApplicantId).HasMaxLength(100);
+            entity.Property(e => e.SumsubInspectionId).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Subscription>(entity =>
@@ -52,6 +55,8 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasOne(e => e.Principal).WithMany().HasForeignKey(e => e.PrincipalId);
             entity.HasOne(e => e.Enp).WithMany().HasForeignKey(e => e.EnpId);
+            entity.HasMany(e => e.Witnesses).WithOne().HasForeignKey(e => e.SessionId);
+            entity.Property(e => e.SumsubInspectionId).HasMaxLength(100);
         });
 
         modelBuilder.Entity<ElectronicNotarialBookEntry>(entity =>
@@ -60,6 +65,15 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Principal).WithMany().HasForeignKey(e => e.PrincipalId);
             entity.HasOne(e => e.Enp).WithMany().HasForeignKey(e => e.EnpId);
             entity.HasIndex(e => new { e.EnpId, e.EntryNumber }).IsUnique();
+            entity.HasMany(e => e.Witnesses).WithOne().HasForeignKey(e => e.BookEntryId);
+        });
+
+        modelBuilder.Entity<NotarizationWitness>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FullName).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Address).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.IdentityEvidence).IsRequired().HasMaxLength(500);
         });
     }
 }

@@ -22,10 +22,18 @@ export function Sidebar() {
         </div>
         
         <nav className="space-y-1">
-          {navItems.filter(item => !('enpOnly' in item) || (item.enpOnly && user?.isEnp)).map((item) => (
+          {navItems.filter(item => {
+            const isEnp = user?.role === 'enp' || (user as any)?.isEnp;
+            const isEna = user?.role === 'ena' || user?.role === 'admin';
+            
+            if ('enpOnly' in item && item.enpOnly && !isEnp) return false;
+            if ('enaOnly' in item && item.enaOnly && !isEna) return false;
+            
+            return true;
+          }).map((item) => (
             <Link
               key={item.to}
-              to={item.to}
+              to={item.to as any}
               activeProps={{ className: 'bg-brand-muted text-brand font-medium' }}
               className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-main hover:bg-slate-50 transition-colors"
             >

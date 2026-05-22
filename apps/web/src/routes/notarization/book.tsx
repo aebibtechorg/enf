@@ -21,6 +21,12 @@ function NotarialBookPage() {
           <h1 className="text-3xl font-bold text-stone-900">Electronic Notarial Book</h1>
           <p className="mt-1 text-stone-500">Official chronological record of your electronic notarial acts (Rule VIII).</p>
         </div>
+        <button 
+          onClick={() => alert('Preparing monthly report for the ENA (Rule VIII, Sec 3)...')}
+          className="rounded-2xl bg-stone-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-stone-800"
+        >
+          Export Monthly Report
+        </button>
       </div>
 
       <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
@@ -52,6 +58,14 @@ function NotarialBookPage() {
                 <td className="px-6 py-4">
                    <p className="text-stone-900">Verified Principal</p>
                    <p className="text-[10px] text-stone-500">{entry.principalIdentityEvidence}</p>
+                   {entry.witnesses?.length > 0 && (
+                     <div className="mt-2 space-y-1 border-t border-stone-100 pt-1">
+                        <p className="text-[10px] font-bold text-stone-400 uppercase">Witnesses:</p>
+                        {entry.witnesses.map(w => (
+                          <p key={w.id} className="text-[10px] text-stone-500">{w.fullName}</p>
+                        ))}
+                     </div>
+                   )}
                 </td>
                 <td className="px-6 py-4 font-medium">PHP {entry.feeCharged.toFixed(2)}</td>
                 <td className="px-6 py-4">

@@ -11,7 +11,9 @@ public record UserDto(
     string? RollNumber,
     string? IbpNumber,
     string? RegularPlaceOfBusiness,
-    string EkycStatus);
+    string EkycStatus,
+    bool IsOnboarded,
+    bool WatchedInstructionalVideo);
 
 public record CreateUserRequest(string Email, string FullName);
 
@@ -20,4 +22,5 @@ public record ApplyEnpRequest(
     DateTime CommissionExpiry,
     string RollNumber,
     string IbpNumber,
-    string RegularPlaceOfBusiness);
+    string RegularPlaceOfBusiness,
+    bool WatchedInstructionalVideo);

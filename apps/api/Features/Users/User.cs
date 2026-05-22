@@ -15,5 +15,10 @@ public class User
     public string? IbpNumber { get; set; }
     public string? RegularPlaceOfBusiness { get; set; }
     public string EkycStatus { get; set; } = "none";
+    public string? SumsubApplicantId { get; set; }
+    public string? SumsubInspectionId { get; set; }
     public string? DigitalCertificate { get; set; } // Base64 encoded X.509
+    
+    public bool IsOnboarded { get; set; }
+    public bool WatchedInstructionalVideo { get; set; }
 }

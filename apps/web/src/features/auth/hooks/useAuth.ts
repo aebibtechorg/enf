@@ -1,7 +1,12 @@
 import { createContext, useContext } from 'react'
 import type { authClient } from '../../../lib/auth-client'
 
-export type User = typeof authClient.$Infer.Session.user
+export type User = typeof authClient.$Infer.Session.user & {
+  role?: string
+  isEnp?: boolean
+  isOnboarded?: boolean
+  ekycStatus?: string
+}
 export type Session = typeof authClient.$Infer.Session.session
 
 export interface AuthContextType {
