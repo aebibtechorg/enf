@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth'
 import { jwt } from 'better-auth/plugins/jwt'
-import { admin, twoFactor } from 'better-auth/plugins'
+import { admin } from 'better-auth/plugins/admin'
+import { twoFactor } from 'better-auth/plugins/two-factor'
 import { Pool } from 'pg'
 import { dash } from '@better-auth/infra'
 

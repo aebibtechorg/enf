@@ -20,7 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
-builder.AddNpgsqlDbContext<AppDbContext>("appdb");
+builder.AddNpgsqlDbContext<AppDbContext>("appdb", configureDbContextOptions: options =>
+{
+    options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 builder.AddRedisClient("redis");
 
 // A03:2021-Injection - Global HTML Sanitization

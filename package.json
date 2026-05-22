@@ -1,5 +1,5 @@
 {
-  "name": "Example App",
+  "name": "example-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -21,6 +21,9 @@
   },
   "type": "module",
   "pnpm": {
+    "overrides": {
+      "better-call": "^2.0.3"
+    },
     "onlyBuiltDependencies": [
       "esbuild",
       "sharp"
